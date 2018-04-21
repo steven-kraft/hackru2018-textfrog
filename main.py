@@ -64,6 +64,21 @@ class Window(Frame):
         self.hotkeyButton = Button(self.master, text="Set HotKey", command = self.getHotkeyEntry)
         self.hotkeyButton.pack(pady=5)
 
+
+
+        #Alt Shift Ctrl
+        self.chAlt = Checkbutton(self.master, text="Alt", variable=varChAlt, onvalue = 1, offvalue = 0, height=1, width = 20)
+        self.chAlt.pack(anchor = W )
+
+        self.chShift = Checkbutton(self.master, text="Shift", variable=varChShift, onvalue = 1, offvalue = 0, height=1, width = 20)
+        self.chShift.pack(anchor = W )
+
+        self.chCtrl = Checkbutton(self.master, text="Ctrl", variable=varChCtrl, onvalue = 1, offvalue = 0, height=1, width = 20)
+        self.chCtrl.pack(anchor = W)
+
+        self.ascButton = Button(self.master, text = "Set Shift, Alt, Ctrl Keys")
+        self.ascButton.pack(pady=5)
+
         #Display Labels
         self.regexLabel = Label(self.master, textvariable = regexVar)
         self.regexLabel.pack(pady=5)
@@ -71,16 +86,6 @@ class Window(Frame):
         self.hotkeyLabel.pack(pady=5)
         self.ascLabel = Label(self.master, textvariable = ascVar)
         self.ascLabel.pack()
-
-        #radio buttons
-        self.rAlt = Radiobutton(self.master, text="Alt", variable=ascVar, value="Alt",command=self.sel)
-        self.rAlt.pack(anchor = W )
-
-        self.rShift = Radiobutton(self.master, text="Shift", variable=ascVar, value="Shift",command=self.sel)
-        self.rShift.pack(anchor = W )
-
-        self.rCtrl = Radiobutton(self.master, text="Ctrl", variable=ascVar, value="Ctrl",command=self.sel)
-        self.rCtrl.pack(anchor = W)
 
         #menu
         menu = Menu(self.master)
@@ -98,9 +103,16 @@ class Window(Frame):
     def getHotkeyEntry(self):
         hotkeyVar.set(self.hotkeyEntry.get())
 
-    def sel(self):
-        selection = str(ascVar.get())
-        ascVar.set(selection)
+    def getascVar(self):
+        """if varChAlt == 1:
+            ascVar += "Alt "
+        else:
+            ascVar -= "Alt "
+        if varChShift == 1:
+            ascVar += "Shift "
+        else:
+            ascVar -= "Shift """
+
 
 
 root = Tk()
@@ -109,8 +121,11 @@ regexVar.set("Default")
 hotkeyVar = StringVar()
 hotkeyVar.set("Default")
 
-ascVar = StringVar()
-ascVar.set("Default")
+varChAlt = IntVar()
+varChShift = IntVar()
+varChCtrl = IntVar()
+
+ascVar = ""
 #root.geometry("400x300")
 
 app = Window(root)
