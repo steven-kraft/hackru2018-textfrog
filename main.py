@@ -24,21 +24,12 @@ def performReg(reg):
     setClipboard(result)
     return result
 
-def hotkeyCheck():
-    keyboard.add_hotkey("ctrl+alt+v", performReg, args=("x"))
-    keyboard.wait()
-
-t = threading.Thread(target=hotkeyCheck)
-t.daemon = True
-t.start()
-
 class Window(Frame):
     def __init__(self, master = None):
         Frame.__init__(self, master)
-
         self.master = master
-
         self.init_window()
+        self.setHotkey()
 
     def init_window(self):
 
@@ -52,7 +43,7 @@ class Window(Frame):
         self.regexEntry = Entry(self.master, bd = 5)
         self.regexEntry.pack(pady=10,fill=X)
 
-        self.regexButton = Button(self.master, text="Set Regex", command = self.getRegexEntry)
+        self.regexButton = Button(self.master, text="Set Regex", command = self.setRegexEntry)
         self.regexButton.pack(pady=5)
 
         #hotkey entry
@@ -61,7 +52,7 @@ class Window(Frame):
         self.hotkeyEntry = Entry(self.master, bd = 5)
         self.hotkeyEntry.pack(pady=10,fill=X)
 
-        self.hotkeyButton = Button(self.master, text="Set HotKey", command = self.getHotkeyEntry)
+        self.hotkeyButton = Button(self.master, text="Set HotKey", command = self.setHotkeyEntry)
         self.hotkeyButton.pack(pady=5)
 
 
@@ -97,11 +88,12 @@ class Window(Frame):
     def client_exit(self):
         exit()
 
-    def getRegexEntry(self):
+    def setRegexEntry(self):
          regexVar.set(self.regexEntry.get())
 
-    def getHotkeyEntry(self):
+    def setHotkeyEntry(self):
         hotkeyVar.set(self.hotkeyEntry.get())
+        self.setHotkey()
 
     def getascVar(self):
         """if varChAlt == 1:
@@ -114,12 +106,27 @@ class Window(Frame):
             ascVar -= "Shift """
 
 
+    def getHotKeyString(self):
+        #TODO return full hotkey string
+        return hotkeyVar.get()
+
+    def setHotkey(self):
+        try:
+            keyboard.unhook_all()
+        except AttributeError:
+            print("Hotkey not set, setting one now.")
+
+        try:
+            keyboard.add_hotkey(self.getHotKeyString(), performReg, args=[regexVar.get()])
+        except ValueError:
+            print("Error getting hotkey, setting default: Ctrl+Alt+V")
+            keyboard.add_hotkey("ctrl+alt+v", performReg, args=[regexVar.get()])
 
 root = Tk()
 regexVar = StringVar()
 regexVar.set("Default")
 hotkeyVar = StringVar()
-hotkeyVar.set("Default")
+hotkeyVar.set("")
 
 varChAlt = IntVar()
 varChShift = IntVar()
