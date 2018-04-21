@@ -1,7 +1,8 @@
 from tkinter import *
 import win32clipboard
 import re
-import pyHook
+import keyboard
+import threading
 
 def getClipboard():
     win32clipboard.OpenClipboard()
@@ -23,18 +24,13 @@ def performReg(reg):
     setClipboard(result)
     return result
 
-def OnKeyboardEvent(event):
-    ctrl_pressed = pyHook.GetKeyState(162) == 128
-    alt_pressed = pyHook.GetKeyState(164) == 128
-    letter_pressed = pyHook.HookConstants.IDToName(event.KeyID) == 'V'
-    if ctrl_pressed and alt_pressed and letter_pressed:
-        performReg("x")
-        print("Success")
-    return True
+def hotkeyCheck():
+    keyboard.add_hotkey("ctrl+alt+v", performReg, args=("x"))
+    keyboard.wait()
 
-hm = pyHook.HookManager()
-hm.KeyDown = OnKeyboardEvent
-hm.HookKeyboard()
+t = threading.Thread(target=hotkeyCheck)
+t.daemon = True
+t.start()
 
 root = Tk()
 
