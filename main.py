@@ -51,7 +51,7 @@ class Window(Frame):
         self.hotkeyEntry = Entry(self.master, bd = 5)
         self.hotkeyEntry.pack(pady=10,fill=X)
 
-        self.hotkeyButton = Button(self.master, text="Set HotKey", command = self.setHotkeyEntry)
+        self.hotkeyButton = Button(self.master, text="Set HotKey", command = self.setHotkey)
         self.hotkeyButton.pack(pady=5)
 
 
@@ -90,16 +90,12 @@ class Window(Frame):
     def setRegexEntry(self):
          regexVar.set(self.regexEntry.get())
 
-    def setHotkeyEntry(self):
-        hotkeyVar.set(self.hotkeyEntry.get())
-        self.setHotkey()
-
     def getHotKeyString(self):
         modifiers = []
         if varChCtrl.get(): modifiers.append("Ctrl")
         if varChAlt.get(): modifiers.append("Alt")
         if varChCtrl.get(): modifiers.append("Shift")
-        modifiers.append(hotkeyVar.get())
+        modifiers.append(self.hotkeyEntry.get())
         return "+".join(modifiers)
 
     def setHotkey(self):
@@ -111,6 +107,7 @@ class Window(Frame):
         try:
             hotkey = self.getHotKeyString()
             keyboard.add_hotkey(hotkey, performReg, args=[regexVar.get()])
+            hotkeyVar.set(hotkey)
             print("Hotkey set to %s" % hotkey)
         except ValueError:
             print("Error getting hotkey, setting default: Ctrl+Alt+V")
