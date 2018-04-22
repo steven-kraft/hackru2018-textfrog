@@ -65,11 +65,24 @@ class Window(Frame):
         self.hotkeyButton = Button(self.master, text="Set HotKey", command = self.setHotkey)
         self.hotkeyButton.pack(pady=5)
 
+        #Radio buttons
+        self.ResultsLabel = Label(self.master, text = "Separate results by:")
+        self.ResultsLabel.pack(pady=5)
+        self.rButton1 = Radiobutton(self.master, text="New Line (\\n)", variable=resultVar, value=0)
+        self.rButton1.pack( anchor = W )
+        self.rButton2 = Radiobutton(self.master, text="Comma (,)", variable=resultVar, value=1)
+        self.rButton2.pack( anchor = W)
+
+
         #Display Labels
         self.regexLabel = Label(self.master, textvariable = regexVar)
         self.regexLabel.pack(pady=5)
         self.hotkeyLabel = Label(self.master, textvariable = hotkeyVar)
         self.hotkeyLabel.pack(pady=5)
+
+    #def resultSel(self):
+        #selection = "You selected the option " + str(var.get())
+        #self.ResultsLabel.config(text = selection)
 
     def setRegexEntry(self):
          regexVar.set(self.regexEntry.get())
@@ -115,6 +128,7 @@ def limitSizeKeyVar(*args):
 root = Tk()
 regexVar = StringVar()
 hotkeyVar = StringVar()
+resultVar = IntVar()
 
 keyVar = StringVar()
 keyVar.trace('w', limitSizeKeyVar)
