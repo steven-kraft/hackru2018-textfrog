@@ -49,7 +49,7 @@ class Window(Frame):
 
         #hotkey entry
         Label(self.master,text="Enter hotkey:").pack()
-        self.hotkeyEntry = Entry(self.master, bd = 5, textvariable = hotkeyVar)
+        self.hotkeyEntry = Entry(self.master, bd = 5, textvariable = keyVar)
         self.hotkeyEntry.pack(pady=10,fill=X)
 
         #Alt Shift Ctrl
@@ -102,21 +102,22 @@ class Window(Frame):
         try:
             hotkey = self.getHotKeyString()
             keyboard.add_hotkey(hotkey, self.performReg)
-            #hotkeyVar.set(hotkey)
+            hotkeyVar.set(hotkey)
             print("Hotkey set to %s" % hotkey)
         except ValueError:
             print("Error getting hotkey, setting default: Ctrl+Alt+V")
             keyboard.add_hotkey("ctrl+alt+v", self.performReg)
 
-def limitSizeHotkeyVar(*args):
-    value =  hotkeyVar.get()
-    if len(value) > 1: hotkeyVar.set(value[:1])
+def limitSizeKeyVar(*args):
+    value =  keyVar.get()
+    if len(value) > 1: keyVar.set(value[:1])
 
 root = Tk()
 regexVar = StringVar()
 hotkeyVar = StringVar()
-hotkeyVar.set("")
-hotkeyVar.trace('w', limitSizeHotkeyVar)
+
+keyVar = StringVar()
+keyVar.trace('w', limitSizeKeyVar)
 
 varChAlt = BooleanVar()
 varChShift = BooleanVar()
