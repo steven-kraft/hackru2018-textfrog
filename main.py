@@ -7,7 +7,10 @@ from win10toast import ToastNotifier
 
 def getClipboard():
     win32clipboard.OpenClipboard()
-    data = win32clipboard.GetClipboardData()
+    try:
+        data = win32clipboard.GetClipboardData()
+    except TypeError:
+        data = ""
     win32clipboard.CloseClipboard()
     return data
 
@@ -24,7 +27,7 @@ def showNotification(toaster, title, msg):
                        threaded=True)
 
 class Window(Frame):
-    def __init__(self, master = None):
+    def __init__(self, master=None):
         Frame.__init__(self, master)
         self.master = master
         self.init_window()
@@ -68,14 +71,6 @@ class Window(Frame):
         self.hotkeyLabel = Label(self.master, textvariable = hotkeyVar)
         self.hotkeyLabel.pack(pady=5)
 
-
-        #menu
-        menu = Menu(self.master)
-        self.master.config(menu=menu)
-        file = Menu(menu)
-        file.add_command(label="Exit", command = exit)
-        menu.add_cascade(label="File", menu=file)
-
     def setRegexEntry(self):
          regexVar.set(self.regexEntry.get())
 
@@ -83,6 +78,7 @@ class Window(Frame):
         reg = re.compile(regexVar.get())
         text = getClipboard()
         result = reg.findall(text)
+        result = list(filter(None, result))
         if len(result) != 0:
             setClipboard("\n".join(result))
             showNotification(toaster, "Success!", "\n".join(result))
@@ -118,7 +114,6 @@ def limitSizeHotkeyVar(*args):
 
 root = Tk()
 regexVar = StringVar()
-regexVar.set("")
 hotkeyVar = StringVar()
 hotkeyVar.set("")
 hotkeyVar.trace('w', limitSizeHotkeyVar)
@@ -129,18 +124,6 @@ varChCtrl = BooleanVar()
 
 
 #root.geometry("400x300")
-
-
-"""toaster.show_toast("Hello World!!!",
-                   "Python is 10 seconds awsm!",
-                   icon_path="icon/frogicon.ico",
-                   duration=10,
-                   threaded=True)
-toaster.show_toast("Example two",
-                   "This notification is in it's own thread!",
-                   icon_path=None,
-                   duration=5,
-                   threaded=True)"""
 
 toaster = ToastNotifier()
 app = Window(root)
