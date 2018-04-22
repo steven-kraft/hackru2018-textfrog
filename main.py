@@ -46,7 +46,7 @@ class Window(Frame):
 
         #hotkey entry
         Label(self.master,text="Enter hotkey:").pack()
-        self.hotkeyEntry = Entry(self.master, bd = 5)
+        self.hotkeyEntry = Entry(self.master, bd = 5, textvariable = hotkeyVar)
         self.hotkeyEntry.pack(pady=10,fill=X)
 
         #Alt Shift Ctrl
@@ -67,8 +67,7 @@ class Window(Frame):
         self.regexLabel.pack(pady=5)
         self.hotkeyLabel = Label(self.master, textvariable = hotkeyVar)
         self.hotkeyLabel.pack(pady=5)
-        self.ascLabel = Label(self.master, textvariable = ascVar)
-        self.ascLabel.pack()
+
 
         #menu
         menu = Menu(self.master)
@@ -94,7 +93,7 @@ class Window(Frame):
         modifiers = []
         if varChCtrl.get(): modifiers.append("Ctrl")
         if varChAlt.get(): modifiers.append("Alt")
-        if varChCtrl.get(): modifiers.append("Shift")
+        if varChShift.get(): modifiers.append("Shift")
         modifiers.append(self.hotkeyEntry.get())
         return "+".join(modifiers)
 
@@ -107,23 +106,28 @@ class Window(Frame):
         try:
             hotkey = self.getHotKeyString()
             keyboard.add_hotkey(hotkey, self.performReg)
-            hotkeyVar.set(hotkey)
+            #hotkeyVar.set(hotkey)
             print("Hotkey set to %s" % hotkey)
         except ValueError:
             print("Error getting hotkey, setting default: Ctrl+Alt+V")
             keyboard.add_hotkey("ctrl+alt+v", self.performReg)
+
+def limitSizeHotkeyVar(*args):
+    value =  hotkeyVar.get()
+    if len(value) > 1: hotkeyVar.set(value[:1])
 
 root = Tk()
 regexVar = StringVar()
 regexVar.set("")
 hotkeyVar = StringVar()
 hotkeyVar.set("")
+hotkeyVar.trace('w', limitSizeHotkeyVar)
 
 varChAlt = BooleanVar()
 varChShift = BooleanVar()
 varChCtrl = BooleanVar()
 
-ascVar = ""
+
 #root.geometry("400x300")
 
 
