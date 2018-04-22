@@ -12,6 +12,8 @@ examples = {
     "IP Addresses": "((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)"
 }
 
+delims = ["\n", ","]
+
 def getClipboard():
     win32clipboard.OpenClipboard()
     try:
@@ -116,8 +118,9 @@ class Window(Frame):
         result = reg.findall(text)
         result = list(filter(None, result))
         if len(result) != 0:
-            setClipboard("\n".join(result))
-            showNotification(toaster, "Success!", "\n".join(result))
+            join_result = delims[resultVar.get()].join(result)
+            setClipboard(join_result)
+            showNotification(toaster, "Success!", join_result)
             print(result)
         else:
             showNotification(toaster, "No Match!", "")
