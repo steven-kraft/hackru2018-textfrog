@@ -5,6 +5,13 @@ import keyboard
 import threading
 from win10toast import ToastNotifier
 
+examples = {
+    "Phone Numbers": "(\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4})",
+    "Youtube URLs": "(?:(?:https?\:\/\/)?(?:www\.)?(?:youtube|youtu)(?:(?:\.com|\.be)\/)(?:embed\/)?(?:watch\?)?(?:feature=player_embedded)?&?(?:v=)?([0-z]{11}|[0-z]{4}(\-|\_)[0-z]{4}|.(\-|\_)[0-z]{9}))",
+    "Email Addresses": "^([a-z0-9_\.-]+\@[\da-z\.-]+\.[a-z\.]{2,6})$",
+    "IP Addresses": "((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)"
+}
+
 def getClipboard():
     win32clipboard.OpenClipboard()
     try:
@@ -41,7 +48,7 @@ class Window(Frame):
 
         #regex entry
         Label(self.master,text="Enter regex:").pack()
-        self.regexEntry = Entry(self.master, bd = 5)
+        self.regexEntry = Entry(self.master, bd = 5, textvariable=regexEntryVar)
         self.regexEntry.pack(pady=10,fill=X)
 
         self.regexButton = Button(self.master, text="Set Regex", command = self.setRegexEntry)
@@ -74,6 +81,13 @@ class Window(Frame):
         self.rButton2.pack( anchor = W)
 
 
+        #Regex examples
+        Label(self.master,text="Regex Examples:").pack()
+        self.exampleDropdown = OptionMenu(self.master, exampleVar, *examples)
+        self.exampleDropdown.pack(pady=10,fill=X)
+        self.exampleButton = Button(self.master, text="Import Regex", command = self.setExampleRegex)
+        self.exampleButton.pack(pady=5)
+
         #Display Labels
         self.regexLabel = Label(self.master, textvariable = regexVar)
         self.regexLabel.pack(pady=5)
@@ -92,6 +106,8 @@ class Window(Frame):
             #TODO Set Error Message in Regex Label Area
             pass
 
+    def setExampleRegex(self):
+        regexEntryVar.set(examples[exampleVar.get()])
 
     def performReg(self):
         print("Performing Text Manipulation")
@@ -140,11 +156,14 @@ def limitSizeKeyVar(*args):
 root = Tk()
 root.resizable(False, False)
 regexVar = StringVar()
+regexEntryVar = StringVar()
 hotkeyVar = StringVar()
 resultVar = IntVar()
 
 keyVar = StringVar()
 keyVar.trace('w', limitSizeKeyVar)
+
+exampleVar = StringVar()
 
 varChAlt = BooleanVar()
 varChShift = BooleanVar()
