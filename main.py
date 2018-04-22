@@ -17,14 +17,11 @@ def setClipboard(data):
     win32clipboard.SetClipboardText(data)
     win32clipboard.CloseClipboard()
 
-def performReg(reg):
-    #TODO Add Notification that Modification was made
-    reg = re.compile(reg)
-    text = getClipboard()
-    result = reg.findall(text)
-    if len(result) != 0:
-        setClipboard(result.join("\n"))
-    return result
+def showNotification(toaster, title, msg):
+    toaster.show_toast(title, msg,
+                       icon_path="icon/frogicon.ico",
+                       duration=5,
+                       threaded=True)
 
 class Window(Frame):
     def __init__(self, master = None):
@@ -52,11 +49,6 @@ class Window(Frame):
         self.hotkeyEntry = Entry(self.master, bd = 5)
         self.hotkeyEntry.pack(pady=10,fill=X)
 
-        self.hotkeyButton = Button(self.master, text="Set HotKey", command = self.setHotkey)
-        self.hotkeyButton.pack(pady=5)
-
-
-
         #Alt Shift Ctrl
         self.chAlt = Checkbutton(self.master, text="Alt", variable=varChAlt, onvalue = True, offvalue = False, height=1, width = 20)
         self.chAlt.pack(anchor = W)
@@ -67,8 +59,8 @@ class Window(Frame):
         self.chCtrl = Checkbutton(self.master, text="Ctrl", variable=varChCtrl, onvalue = True, offvalue = False, height=1, width = 20)
         self.chCtrl.pack(anchor = W)
 
-        self.ascButton = Button(self.master, text = "Set Shift, Alt, Ctrl Keys")
-        self.ascButton.pack(pady=5)
+        self.hotkeyButton = Button(self.master, text="Set HotKey", command = self.setHotkey)
+        self.hotkeyButton.pack(pady=5)
 
         #Display Labels
         self.regexLabel = Label(self.master, textvariable = regexVar)
@@ -82,14 +74,21 @@ class Window(Frame):
         menu = Menu(self.master)
         self.master.config(menu=menu)
         file = Menu(menu)
-        file.add_command(label="Exit", command = self.client_exit)
+        file.add_command(label="Exit", command = exit)
         menu.add_cascade(label="File", menu=file)
-
-    def client_exit(self):
-        exit()
 
     def setRegexEntry(self):
          regexVar.set(self.regexEntry.get())
+
+    def performReg(self):
+        reg = re.compile(regexVar.get())
+        text = getClipboard()
+        result = reg.findall(text)
+        if len(result) != 0:
+            setClipboard("\n".join(result))
+            showNotification(toaster, "Success!", "\n".join(result))
+            print(result)
+        return result
 
     def getHotKeyString(self):
         modifiers = []
@@ -107,16 +106,16 @@ class Window(Frame):
 
         try:
             hotkey = self.getHotKeyString()
-            keyboard.add_hotkey(hotkey, performReg, args=[regexVar.get()])
+            keyboard.add_hotkey(hotkey, self.performReg)
             hotkeyVar.set(hotkey)
             print("Hotkey set to %s" % hotkey)
         except ValueError:
             print("Error getting hotkey, setting default: Ctrl+Alt+V")
-            keyboard.add_hotkey("ctrl+alt+v", performReg, args=[regexVar.get()])
+            keyboard.add_hotkey("ctrl+alt+v", self.performReg)
 
 root = Tk()
 regexVar = StringVar()
-regexVar.set("Default")
+regexVar.set("")
 hotkeyVar = StringVar()
 hotkeyVar.set("")
 
@@ -127,7 +126,7 @@ varChCtrl = BooleanVar()
 ascVar = ""
 #root.geometry("400x300")
 
-toaster = ToastNotifier()
+
 """toaster.show_toast("Hello World!!!",
                    "Python is 10 seconds awsm!",
                    icon_path="icon/frogicon.ico",
@@ -139,7 +138,7 @@ toaster.show_toast("Example two",
                    duration=5,
                    threaded=True)"""
 
-
+toaster = ToastNotifier()
 app = Window(root)
 
 root.mainloop()
