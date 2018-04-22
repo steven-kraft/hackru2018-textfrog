@@ -17,11 +17,12 @@ def setClipboard(data):
     win32clipboard.CloseClipboard()
 
 def performReg(reg):
+    #TODO Add Notification that Modification was made
     reg = re.compile(reg)
     text = getClipboard()
-    result = reg.findall(text)[0]
-    #TODO Add Notification that Modification was made
-    setClipboard(result)
+    result = reg.findall(text)
+    if len(result) != 0:
+        setClipboard(result.join("\n"))
     return result
 
 class Window(Frame):
@@ -38,8 +39,7 @@ class Window(Frame):
         self.pack(fill=BOTH, expand=1)
 
         #regex entry
-        self.regexEntryLabel = Label(self.master,text="Enter regex:")
-        self.regexEntryLabel.pack()
+        Label(self.master,text="Enter regex:").pack()
         self.regexEntry = Entry(self.master, bd = 5)
         self.regexEntry.pack(pady=10,fill=X)
 
@@ -47,8 +47,7 @@ class Window(Frame):
         self.regexButton.pack(pady=5)
 
         #hotkey entry
-        self.hotkeyEntryLabel = Label(self.master,text="Enter hotkey:")
-        self.hotkeyEntryLabel.pack()
+        Label(self.master,text="Enter hotkey:").pack()
         self.hotkeyEntry = Entry(self.master, bd = 5)
         self.hotkeyEntry.pack(pady=10,fill=X)
 
@@ -58,13 +57,13 @@ class Window(Frame):
 
 
         #Alt Shift Ctrl
-        self.chAlt = Checkbutton(self.master, text="Alt", variable=varChAlt, onvalue = 1, offvalue = 0, height=1, width = 20)
-        self.chAlt.pack(anchor = W )
+        self.chAlt = Checkbutton(self.master, text="Alt", variable=varChAlt, onvalue = True, offvalue = False, height=1, width = 20)
+        self.chAlt.pack(anchor = W)
 
-        self.chShift = Checkbutton(self.master, text="Shift", variable=varChShift, onvalue = 1, offvalue = 0, height=1, width = 20)
-        self.chShift.pack(anchor = W )
+        self.chShift = Checkbutton(self.master, text="Shift", variable=varChShift, onvalue = True, offvalue = False, height=1, width = 20)
+        self.chShift.pack(anchor = W)
 
-        self.chCtrl = Checkbutton(self.master, text="Ctrl", variable=varChCtrl, onvalue = 1, offvalue = 0, height=1, width = 20)
+        self.chCtrl = Checkbutton(self.master, text="Ctrl", variable=varChCtrl, onvalue = True, offvalue = False, height=1, width = 20)
         self.chCtrl.pack(anchor = W)
 
         self.ascButton = Button(self.master, text = "Set Shift, Alt, Ctrl Keys")
@@ -95,20 +94,13 @@ class Window(Frame):
         hotkeyVar.set(self.hotkeyEntry.get())
         self.setHotkey()
 
-    def getascVar(self):
-        """if varChAlt == 1:
-            ascVar += "Alt "
-        else:
-            ascVar -= "Alt "
-        if varChShift == 1:
-            ascVar += "Shift "
-        else:
-            ascVar -= "Shift """
-
-
     def getHotKeyString(self):
-        #TODO return full hotkey string
-        return hotkeyVar.get()
+        modifiers = []
+        if varChCtrl.get(): modifiers.append("Ctrl")
+        if varChAlt.get(): modifiers.append("Alt")
+        if varChCtrl.get(): modifiers.append("Shift")
+        modifiers.append(hotkeyVar.get())
+        return "+".join(modifiers)
 
     def setHotkey(self):
         try:
@@ -117,7 +109,9 @@ class Window(Frame):
             print("Hotkey not set, setting one now.")
 
         try:
-            keyboard.add_hotkey(self.getHotKeyString(), performReg, args=[regexVar.get()])
+            hotkey = self.getHotKeyString()
+            keyboard.add_hotkey(hotkey, performReg, args=[regexVar.get()])
+            print("Hotkey set to %s" % hotkey)
         except ValueError:
             print("Error getting hotkey, setting default: Ctrl+Alt+V")
             keyboard.add_hotkey("ctrl+alt+v", performReg, args=[regexVar.get()])
@@ -128,9 +122,9 @@ regexVar.set("Default")
 hotkeyVar = StringVar()
 hotkeyVar.set("")
 
-varChAlt = IntVar()
-varChShift = IntVar()
-varChCtrl = IntVar()
+varChAlt = BooleanVar()
+varChShift = BooleanVar()
+varChCtrl = BooleanVar()
 
 ascVar = ""
 #root.geometry("400x300")
