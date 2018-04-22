@@ -72,9 +72,16 @@ class Window(Frame):
         self.hotkeyLabel.pack(pady=5)
 
     def setRegexEntry(self):
-         regexVar.set(self.regexEntry.get())
+        try:
+            re.compile(self.regexEntry.get())
+            regexVar.set(self.regexEntry.get())
+        except:
+            #TODO Set Error Message in Regex Label Area
+            pass
+
 
     def performReg(self):
+        print("Performing Text Manipulation")
         reg = re.compile(regexVar.get())
         text = getClipboard()
         result = reg.findall(text)
@@ -83,6 +90,8 @@ class Window(Frame):
             setClipboard("\n".join(result))
             showNotification(toaster, "Success!", "\n".join(result))
             print(result)
+        else:
+            showNotification(toaster, "No Match!", "")
         return result
 
     def getHotKeyString(self):
@@ -99,6 +108,7 @@ class Window(Frame):
         except AttributeError:
             print("Hotkey not set, setting one now.")
 
+        default = "Ctrl+Alt+V"
         try:
             hotkey = self.getHotKeyString()
             keyboard.add_hotkey(hotkey, self.performReg)
@@ -106,13 +116,16 @@ class Window(Frame):
             print("Hotkey set to %s" % hotkey)
         except ValueError:
             print("Error getting hotkey, setting default: Ctrl+Alt+V")
-            keyboard.add_hotkey("ctrl+alt+v", self.performReg)
+            keyboard.add_hotkey(default, self.performReg)
+            hotkeyVar.set(default)
 
 def limitSizeKeyVar(*args):
     value =  keyVar.get()
-    if len(value) > 1: keyVar.set(value[:1])
+    if len(value) > 1: keyVar.set(value[-1])
+    keyVar.set(keyVar.get().upper())
 
 root = Tk()
+root.resizable(False, False)
 regexVar = StringVar()
 hotkeyVar = StringVar()
 
@@ -122,7 +135,6 @@ keyVar.trace('w', limitSizeKeyVar)
 varChAlt = BooleanVar()
 varChShift = BooleanVar()
 varChCtrl = BooleanVar()
-
 
 #root.geometry("400x300")
 
