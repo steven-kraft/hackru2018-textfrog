@@ -3,6 +3,7 @@ import win32clipboard
 import re
 import keyboard
 import threading
+from win10toast import ToastNotifier
 
 def getClipboard():
     win32clipboard.OpenClipboard()
@@ -134,6 +135,19 @@ varChCtrl = IntVar()
 
 ascVar = ""
 #root.geometry("400x300")
+
+toaster = ToastNotifier()
+"""toaster.show_toast("Hello World!!!",
+                   "Python is 10 seconds awsm!",
+                   icon_path="icon/frogicon.ico",
+                   duration=10,
+                   threaded=True)
+toaster.show_toast("Example two",
+                   "This notification is in it's own thread!",
+                   icon_path=None,
+                   duration=5,
+                   threaded=True)"""
+
 
 app = Window(root)
 
