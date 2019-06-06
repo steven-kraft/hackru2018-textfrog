@@ -14,9 +14,9 @@ This program allows users to assign regular expressions to hotkeys to perform te
 
 Steve Kraft https://github.com/steven-kraft
 
-Noah Eng https://github.com/jdmnoah
+Noah Eng https://github.com/noaheng
 
 
-Made at HackNYU 2018
+Made at HackRU 2018
 
 ![](images/hackru.jpg)
